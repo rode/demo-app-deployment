@@ -12,12 +12,10 @@ pipeline {
             steps {
                 container('git') {
                     script {
+                        sh "apk add yq"
                     	echo "preparing to deploy ${env.BRANCH_NAME}"
                         echo "get docker image tag from values file"
-                        tag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-
-                        echo "get harbor image sha from harbor"
-                        image = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                        tag = sh(script: "yq r env-values.yaml image.tag", returnStdout: true).trim()
                     }
                 }
 			}
@@ -34,21 +32,18 @@ pipeline {
         	  	}
         	}
             steps {
-                // container('git') {
-                //     sh "echo Validating deployment..."
-                //     sh "echo ${image}"
-                //     sh "apk add jq"
-                //     sh """
-				// 		wget -O- -q \
-				// 			--post-data='{
-				// 				"resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@${image}"
-				// 			}' \
-				// 			--header='Content-Type: application/json' \
-				// 			'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
-                //     """
-                // }
                 container('git') {
-                	echo "validate deployment"
+                    sh "echo Validating deployment..."
+                    sh "echo ${tag}"
+                    sh "apk add jq"
+                    sh """
+						wget -O- -q \
+							--post-data='{
+								"resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@${tag}"
+							}' \
+							--header='Content-Type: application/json' \
+							'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
+                    """
                 }
             }
         }
