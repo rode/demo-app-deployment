@@ -63,7 +63,7 @@ pipeline {
             steps {
                  container('helm') {
                     sh "helm version"
-                    sh "helm upgrade -f env-values.yaml -f ${env.BRANCH_NAME}/values.yaml --install demo-app-test charts/demo-app -n rode-demo-app"
+                    sh "helm upgrade -f env-values.yaml -f environments/${env.BRANCH_NAME}/values.yaml --install demo-app-test charts/demo-app -n rode-demo-app"
                 }
             }
         }
