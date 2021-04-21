@@ -26,7 +26,7 @@ pipeline {
         	when {
         		anyOf {
 					expression {
-						return if(env.CHANGE_TARGET != null && (env.CHANGE_TARGET = 'staging' || env.CHANGE_TARGET = 'prod'));
+						env.CHANGE_TARGET != null && (env.CHANGE_TARGET == 'staging' || env.CHANGE_TARGET == 'prod')
 					}
     				branch 'dev';
     				branch 'staging';
@@ -34,18 +34,21 @@ pipeline {
         	  	}
         	}
             steps {
+                // container('git') {
+                //     sh "echo Validating deployment..."
+                //     sh "echo ${image}"
+                //     sh "apk add jq"
+                //     sh """
+				// 		wget -O- -q \
+				// 			--post-data='{
+				// 				"resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@${image}"
+				// 			}' \
+				// 			--header='Content-Type: application/json' \
+				// 			'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
+                //     """
+                // }
                 container('git') {
-                    sh "echo Validating deployment..."
-                    sh "echo ${image}"
-                    sh "apk add jq"
-                    sh """
-						wget -O- -q \
-							--post-data='{
-								"resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@${image}"
-							}' \
-							--header='Content-Type: application/json' \
-							'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
-                    """
+                	echo "validate deployment"
                 }
             }
         }
