@@ -58,8 +58,9 @@ pipeline {
 							sh "env"
 							if (env.BRANCH_NAME == 'staging' || env.BRANCH_NAME == 'prod') {
 							   build_result = 'FAILURE'
+							   sh "exit 1"
 							} else {
-							   build_result = 'UNSTABLE'
+							   currentBuild.result = "UNSTABLE"
 							}
 						    echo "error caught: $build_result"
 
