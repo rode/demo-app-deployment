@@ -1,5 +1,11 @@
 def tag = ""
 def image = ""
+def build_result = 'SUCCESS'
+if (env.BRANCH_NAME == 'staging' || env.BRANCH_NAME == 'prod') {
+   build_result = 'FAILURE'
+} else {
+   build_result = 'UNSTABLE'
+}
 pipeline {
     agent {
         kubernetes {
@@ -36,7 +42,8 @@ pipeline {
                     sh "echo Validating deployment..."
                     sh "echo ${tag}"
                     sh "apk add jq"
-                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+
+                    catchError(buildResult: $build_result, stageResult: 'FAILURE') {
 						sh """
 							wget -O- -q \
 								--post-data='{
