@@ -36,14 +36,16 @@ pipeline {
                     sh "echo Validating deployment..."
                     sh "echo ${tag}"
                     sh "apk add jq"
-                    sh """
-						wget -O- -q \
-							--post-data='{
-								"resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:${tag}"
-							}' \
-							--header='Content-Type: application/json' \
-							'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
-                    """
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+						sh """
+							wget -O- -q \
+								--post-data='{
+									"resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:${tag}"
+								}' \
+								--header='Content-Type: application/json' \
+								'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
+						"""
+					}
                 }
             }
         }
