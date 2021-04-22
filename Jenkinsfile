@@ -1,5 +1,11 @@
 def tag = ""
 def image = ""
+def build_result = 'SUCCESS'
+if (env.BRANCH_NAME == 'staging' || env.BRANCH_NAME == 'prod') {
+   build_result = 'FAILURE'
+} else {
+   build_result = 'UNSTABLE'
+}
 pipeline {
     agent {
         kubernetes {
@@ -36,14 +42,27 @@ pipeline {
                     sh "echo Validating deployment..."
                     sh "echo ${tag}"
                     sh "apk add jq"
-                    sh """
-						wget -O- -q \
-							--post-data='{
-								"resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:${tag}"
-							}' \
-							--header='Content-Type: application/json' \
-							'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
-                    """
+                    script {
+						try {
+							sh """
+								wget -O- -q \
+									--post-data='{
+										"resourceUri": "harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:${tag}"
+									}' \
+									--header='Content-Type: application/json' \
+									'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
+							"""
+						} catch (err) {
+							if (env.BRANCH_NAME == 'staging' || env.BRANCH_NAME == 'prod') {
+							   build_result = 'FAILURE'
+							   sh "exit 1"
+							} else {
+							   currentBuild.result = "UNSTABLE"
+							}
+						}
+
+                    }
+
                 }
             }
         }
