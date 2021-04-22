@@ -43,7 +43,7 @@ pipeline {
                     sh "echo ${tag}"
                     sh "apk add jq"
 
-                    catchError(buildResult: $build_result, stageResult: 'FAILURE') {
+                    catchError(buildResult: "$build_result", stageResult: 'FAILURE') {
 						sh """
 							wget -O- -q \
 								--post-data='{
@@ -53,6 +53,10 @@ pipeline {
 								'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
 						"""
 					}
+                    script {
+                    	sh "env"
+                    }
+
                 }
             }
         }
