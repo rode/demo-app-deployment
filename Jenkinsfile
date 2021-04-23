@@ -26,7 +26,7 @@ pipeline {
                 }
 			}
     	}
-        stage("evaluate policy"){
+        stage("Evaluate Policy"){
         	when {
         		anyOf {
 					expression {
@@ -66,7 +66,7 @@ pipeline {
                 }
             }
         }
-        stage('deploy') {
+        stage('Deploy') {
     		when {
     			anyOf {
     				branch 'dev';
