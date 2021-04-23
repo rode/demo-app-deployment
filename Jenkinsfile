@@ -53,7 +53,7 @@ pipeline {
 									'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/a6bb1c3c-376b-4e4a-9fa4-a88c27afe0df:attest' | jq .pass | grep true
 							"""
 						} catch (err) {
-							if (env.BRANCH_NAME == 'staging' || env.BRANCH_NAME == 'prod') {
+							if (env.BRANCH_NAME == 'staging' || env.BRANCH_NAME == 'prod' || env.CHANGE_TARGET == 'staging' || env.CHANGE_TARGET == 'prod') {
 							   build_result = 'FAILURE'
 							   sh "exit 1"
 							} else {
