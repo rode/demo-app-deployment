@@ -16,7 +16,7 @@ jobs:
         uses: rode/evaluate-policy-action@action
         with:
           policyName: Sample Harbor Policy
-          resourceUri: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:249a829cb8d6405dfd94956ded8d75b3257dec3559f0e1e190aa81c512eb3f27
+          resourceUri: git://github.com/rode/demo-app/commit/7dcb88e64975e159ede3993842f8ce58fb0c1144@7dcb88e64975e159ede3993842f8ce58fb0c1144
           rodeHost: rode.rode-demo.svc.cluster.local:50051
           rodeInsecure: true
 
