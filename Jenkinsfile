@@ -30,7 +30,7 @@ pipeline {
         	when {
         		anyOf {
 					expression {
-						env.CHANGE_TARGET != null && (env.CHANGE_TARGET == 'staging' || env.CHANGE_TARGET == 'prod')
+						env.CHANGE_TARGET != null
 					}
     				branch 'dev';
     				branch 'staging';
@@ -50,7 +50,7 @@ pipeline {
 										"resourceUri": "harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:${tag}"
 									}' \
 									--header='Content-Type: application/json' \
-									'https://rode.internal.lead.prod.liatr.io/v1alpha1/policies/4127d475-80ec-4d36-9ece-98029176bdec:attest' | jq .pass | grep true
+									'http://rode.rode-demo.svc.cluster.local:50051/v1alpha1/policies/4127d475-80ec-4d36-9ece-98029176bdec:attest' | jq .pass | grep true
 							"""
 						} catch (err) {
 							if (env.BRANCH_NAME == 'staging' || env.BRANCH_NAME == 'prod' || env.CHANGE_TARGET == 'staging' || env.CHANGE_TARGET == 'prod') {
