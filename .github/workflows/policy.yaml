@@ -3,7 +3,7 @@ name: demo-app-deployment
 on:
   push:
     branches:
-      - action
+      - actions
 
 jobs:
   evaluate-policy:
