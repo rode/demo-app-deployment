@@ -18,6 +18,7 @@ jobs:
           policyName: Sample Harbor Policy
           resourceUri: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:249a829cb8d6405dfd94956ded8d75b3257dec3559f0e1e190aa81c512eb3f27
           rodeHost: rode.rode-demo.svc.cluster.local:50051
+          rodeInsecure: true
 
       - name: Test passing
         if: ${{ steps.policy.outputs.pass }}
