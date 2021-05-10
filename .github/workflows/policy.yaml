@@ -1,0 +1,25 @@
+name: demo-app-deployment
+
+on:
+  push:
+    branches:
+      - action
+
+jobs:
+  evaluate-policy:
+    runs-on:
+      - self-hosted
+      - rode-runners-prod
+    steps:
+      - name: Evaluate Policy
+        id: policy
+        uses: rode/evaluate-policy-action@action
+        with:
+          policyName: Sample Harbor Policy
+          resourceUri: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:249a829cb8d6405dfd94956ded8d75b3257dec3559f0e1e190aa81c512eb3f27
+          rodeHost: rode.rode-demo.svc.cluster.local:50051
+
+      - name: Test passing
+        if: ${{ steps.policy.outputs.pass }}
+        run: |
+          echo "Made it!"
