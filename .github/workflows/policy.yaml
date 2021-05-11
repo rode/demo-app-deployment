@@ -4,8 +4,7 @@ on:
   push:
 
 env:
-#  IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
-  IMAGE: foo
+  IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
   RODE_HOST: rode.rode-demo.svc.cluster.local:50051
 
 jobs:
@@ -28,8 +27,7 @@ jobs:
         id: policy
         uses: rode/evaluate-policy-action@v0.1.0
         with:
-#          enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
-          enforce: ${{ github.ref != 'refs/heads/actions' }} # don't require policy to pass in dev
+          enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
           policyName: Sample Harbor Policy
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
