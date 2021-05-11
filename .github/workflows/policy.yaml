@@ -20,16 +20,14 @@ jobs:
         id: get
         run: |
           digest=$(awk '/tag/{print $2}' env-values.yaml)
-          echo "Found digest: $digest"
           resourceUri="${{ env.IMAGE }}@sha256:$digest"
-          echo "Resource uri: $resourceUri"
           echo "::set-output name=resourceUri::$resourceUri"
 
       - name: Evaluate Policy
         id: policy
         uses: rode/evaluate-policy-action@v0.1.0
         with:
-          enforce: true
+          enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
           policyName: Sample Harbor Policy
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
