@@ -1,26 +1,33 @@
-name: demo-app-deployment
+name: policy
 
 on:
   push:
-    branches:
-      - actions
+
+env:
+  IMAGE: harbor.rode.lead.prod.liatr.io/rode-demo/rode-demo-node-app
+  RODE_HOST: rode.rode-demo.svc.cluster.local:50051
 
 jobs:
-  evaluate-policy:
+  evaluate:
     runs-on:
       - self-hosted
       - rode-runners-prod
     steps:
+      - name: Get Resource URI
+        id: get
+        run: |
+          digest=$(awk '/tag/{print $2}'  env-values.yaml)
+          echo "Found digest: $digest"
+          resourceUri="${{ env.IMAGE }}@sha256:$digest"
+          echo "Resource uri: $resourceUri"
+          echo "::set-output name=resoureUri::$resourceUri"
+
       - name: Evaluate Policy
         id: policy
-        uses: rode/evaluate-policy-action@action
+        uses: rode/evaluate-policy-action@v0.1.0
         with:
+          enforce: true
           policyName: Sample Harbor Policy
-          resourceUri: git://github.com/rode/demo-app/commit/7dcb88e64975e159ede3993842f8ce58fb0c1144@7dcb88e64975e159ede3993842f8ce58fb0c1144
-          rodeHost: rode.rode-demo.svc.cluster.local:50051
+          resourceUri: ${{ steps.get.outputs.resourceUri }}
+          rodeHost: ${{ RODE_HOST }}
           rodeInsecure: true
-
-      - name: Test passing
-        if: ${{ steps.policy.outputs.pass }}
-        run: |
-          echo "Made it!"
