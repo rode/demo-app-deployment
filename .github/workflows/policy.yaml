@@ -1,4 +1,4 @@
-name: policy
+name: demo-app-deployment
 
 on:
   push:
@@ -32,3 +32,29 @@ jobs:
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
           rodeInsecure: true
+
+  deploy:
+    if: ${{ contains(fromJson('["refs/heads/dev", "refs/heads/staging", "refs/heads/prod"]'), github.ref) }}
+    needs:
+      - evaluate
+    runs-on:
+      - self-hosted
+      - rode-runners-prod
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Helm
+        run: curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+      - name: Helm Upgrade
+        run: |
+          branchName=${GITHUB_REF##*/}
+          echo "Running on branch $branchName"
+
+#          helm version
+#          helm upgrade -f env-values.yaml \
+#            -f environments/${branchName}/values.yaml \
+#            --install demo-app-test \
+#            charts/demo-app \
+#            -n rode-demo-app-${branchName}
