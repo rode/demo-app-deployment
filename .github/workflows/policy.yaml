@@ -28,7 +28,8 @@ jobs:
         id: policy
         uses: rode/evaluate-policy-action@v0.1.0
         with:
-          enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
+#          enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
+          enforce: ${{ github.ref != 'refs/heads/actions' }} # don't require policy to pass in dev
           policyName: Sample Harbor Policy
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
