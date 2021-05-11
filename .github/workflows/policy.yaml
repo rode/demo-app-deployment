@@ -29,5 +29,5 @@ jobs:
           enforce: true
           policyName: Sample Harbor Policy
           resourceUri: ${{ steps.get.outputs.resourceUri }}
-          rodeHost: ${{ RODE_HOST }}
+          rodeHost: ${{ env.RODE_HOST }}
           rodeInsecure: true
