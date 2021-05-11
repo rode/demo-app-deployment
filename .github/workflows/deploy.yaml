@@ -5,6 +5,7 @@ on:
     workflows:
       - policy
     branches:
+      - actions # TODO: remove
       - dev
       - staging
       - prod
@@ -29,9 +30,9 @@ jobs:
           branchName=${GITHUB_REF##*/}
           echo "Running on branch $branchName"
 
-          helm version
-          helm upgrade -f env-values.yaml \
-            -f environments/${branchName}/values.yaml \
-            --install demo-app-test \
-            charts/demo-app \
-            -n rode-demo-app-${branchName}
+#          helm version
+#          helm upgrade -f env-values.yaml \
+#            -f environments/${branchName}/values.yaml \
+#            --install demo-app-test \
+#            charts/demo-app \
+#            -n rode-demo-app-${branchName}
