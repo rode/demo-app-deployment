@@ -34,8 +34,7 @@ jobs:
           rodeInsecure: true
 
   deploy:
-#    if: ${{ contains(fromJson('["refs/heads/dev", "refs/heads/staging", "refs/heads/prod"]'), github.ref) }}
-    if: ${{ contains(fromJson('["refs/heads/actions", "refs/heads/staging", "refs/heads/prod"]'), github.ref) }}
+    if: ${{ contains(fromJson('["refs/heads/dev", "refs/heads/staging", "refs/heads/prod"]'), github.ref) }}
     needs:
       - evaluate
     runs-on:
@@ -51,8 +50,6 @@ jobs:
       - name: Helm Upgrade
         run: |
           branchName=${GITHUB_REF##*/}
-          echo "Running on branch $branchName"
-          branchName=dev
 
           helm version
           helm upgrade -f env-values.yaml \
