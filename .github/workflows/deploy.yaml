@@ -8,7 +8,7 @@ on:
       - prod
 
 env:
-  IMAGE: foo #harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
+  IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
   RODE_HOST: rode.rode-demo.svc.cluster.local:50051
 
 jobs:
