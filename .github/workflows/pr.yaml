@@ -27,6 +27,8 @@ jobs:
           resourceUri="${{ env.IMAGE }}@sha256:$digest"
           echo "::set-output name=resourceUri::$resourceUri"
 
+          echo "debug ${{ github.base_ref }}"
+
       - name: Evaluate Policy
         id: policy
         uses: rode/evaluate-policy-action@v0.1.0
