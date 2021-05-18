@@ -27,13 +27,11 @@ jobs:
           resourceUri="${{ env.IMAGE }}@sha256:$digest"
           echo "::set-output name=resourceUri::$resourceUri"
 
-          echo "debug ${{ github.base_ref }}"
-
       - name: Evaluate Policy
         id: policy
         uses: rode/evaluate-policy-action@v0.1.0
         with:
-          enforce: ${{ github.base_ref != 'refs/heads/dev' }} # don't require policy to pass when a PR targets dev
+          enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
           policyName: Sample Harbor Policy
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
