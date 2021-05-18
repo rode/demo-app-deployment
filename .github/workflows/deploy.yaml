@@ -1,14 +1,18 @@
-name: demo-app-deployment
+name: deploy
 
 on:
   push:
+    branches:
+      - dev
+      - staging
+      - prod
 
 env:
   IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
   RODE_HOST: rode.rode-demo.svc.cluster.local:50051
 
 jobs:
-  evaluate:
+  deploy:
     runs-on:
       - self-hosted
       - rode-runners-prod
@@ -32,17 +36,6 @@ jobs:
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
           rodeInsecure: true
-
-  deploy:
-    if: ${{ contains(fromJson('["refs/heads/dev", "refs/heads/staging", "refs/heads/prod"]'), github.ref) }}
-    needs:
-      - evaluate
-    runs-on:
-      - self-hosted
-      - rode-runners-prod
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
 
       - name: Install Helm
         run: curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash

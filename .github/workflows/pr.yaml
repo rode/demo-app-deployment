@@ -1,0 +1,38 @@
+name: pr
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - staging
+      - prod
+
+env:
+  IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
+  RODE_HOST: rode.rode-demo.svc.cluster.local:50051
+
+jobs:
+  evaluate:
+    runs-on:
+      - self-hosted
+      - rode-runners-prod
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Get Resource URI
+        id: get
+        run: |
+          digest=$(awk '/tag/{print $2}' env-values.yaml)
+          resourceUri="${{ env.IMAGE }}@sha256:$digest"
+          echo "::set-output name=resourceUri::$resourceUri"
+
+      - name: Evaluate Policy
+        id: policy
+        uses: rode/evaluate-policy-action@v0.1.0
+        with:
+          enforce: ${{ github.base_ref != 'refs/heads/dev' }} # don't require policy to pass when a PR targets dev
+          policyName: Sample Harbor Policy
+          resourceUri: ${{ steps.get.outputs.resourceUri }}
+          rodeHost: ${{ env.RODE_HOST }}
+          rodeInsecure: true
