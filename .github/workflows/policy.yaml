@@ -1,0 +1,59 @@
+name: demo-app-deployment
+
+on:
+  push:
+
+env:
+  IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
+  RODE_HOST: rode.rode-demo.svc.cluster.local:50051
+
+jobs:
+  evaluate:
+    runs-on:
+      - self-hosted
+      - rode-runners-prod
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Get Resource URI
+        id: get
+        run: |
+          digest=$(awk '/tag/{print $2}' env-values.yaml)
+          resourceUri="${{ env.IMAGE }}@sha256:$digest"
+          echo "::set-output name=resourceUri::$resourceUri"
+
+      - name: Evaluate Policy
+        id: policy
+        uses: rode/evaluate-policy-action@v0.1.0
+        with:
+          enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
+          policyName: Sample Harbor Policy
+          resourceUri: ${{ steps.get.outputs.resourceUri }}
+          rodeHost: ${{ env.RODE_HOST }}
+          rodeInsecure: true
+
+  deploy:
+    if: ${{ contains(fromJson('["refs/heads/dev", "refs/heads/staging", "refs/heads/prod"]'), github.ref) }}
+    needs:
+      - evaluate
+    runs-on:
+      - self-hosted
+      - rode-runners-prod
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Helm
+        run: curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+      - name: Helm Upgrade
+        run: |
+          branchName=${GITHUB_REF##*/}
+
+          helm version
+          helm upgrade -f env-values.yaml \
+            -f environments/${branchName}/values.yaml \
+            --install demo-app-test \
+            charts/demo-app \
+            -n rode-demo-app-${branchName}
