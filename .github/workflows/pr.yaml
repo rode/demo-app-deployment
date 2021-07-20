@@ -38,7 +38,7 @@ jobs:
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Evaluate Resource
-        uses: rode/evaluate-resource-action@v0.3.0
+        uses: rode/enforcer-action@v0.3.0
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
           enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
