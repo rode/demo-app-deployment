@@ -9,7 +9,11 @@ on:
 
 env:
   IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
-  RODE_HOST: rode.rode-demo.svc.cluster.local:50051
+#  RODE_HOST: rode.rode-demo.svc.cluster.local:50051
+  RODE_HOST: 2.tcp.ngrok.io:13623
+#  OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
+  OAUTH2_TOKEN_URL: 'https://aha-keycloak.ngrok.io/auth/realms/rode-demo/protocol/openid-connect/token'
+  OAUTH2_CLIENT_ID: rode-enforcer
 
 jobs:
   evaluate:
@@ -27,12 +31,21 @@ jobs:
           resourceUri="${{ env.IMAGE }}@sha256:$digest"
           echo "::set-output name=resourceUri::$resourceUri"
 
+      - name: Fetch Access Token
+        uses: liatrio/github-actions/oauth2-token@master
+        id: token
+        with:
+          clientId: ${{ env.OAUTH2_CLIENT_ID }}
+          clientSecret: ${{ secrets.CLIENT_SECRET }}
+          tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
+
       - name: Evaluate Policy
         id: policy
-        uses: rode/evaluate-policy-action@v0.1.0
+        uses: rode/evaluate-policy-action@eval-resource
         with:
+          accessToken: ${{ steps.token.outputs.accessToken }}
           enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
-          policyName: Sample Harbor Policy
+          policyGroup: rode-demo
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
           rodeInsecure: true
