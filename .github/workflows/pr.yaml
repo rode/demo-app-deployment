@@ -43,7 +43,7 @@ jobs:
         uses: rode/evaluate-policy-action@eval-resource
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
-          enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
+#          enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
           policyGroup: rode-demo
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
