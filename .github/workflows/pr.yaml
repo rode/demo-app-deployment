@@ -35,7 +35,7 @@ jobs:
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
+          enforce: true
           policyGroup: rode-demo
           resourceUri: ${{ env.IMAGE }}
           rodeHost: ${{ env.RODE_HOST }}
