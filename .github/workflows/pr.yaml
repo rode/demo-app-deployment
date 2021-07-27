@@ -19,24 +19,29 @@ jobs:
       - self-hosted
       - rode-runners-prod
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Fetch Access Token
-        uses: liatrio/github-actions/oauth2-token@master
-        id: token
-        with:
-          clientId: ${{ env.OAUTH2_CLIENT_ID }}
-          clientSecret: ${{ secrets.CLIENT_SECRET }}
-          tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
-
-      - name: Evaluate Resource
-        uses: rode/evaluate-policy-action@pr-comment
-        with:
-          accessToken: ${{ steps.token.outputs.accessToken }}
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          enforce: true
-          policyGroup: rode-demo
-          resourceUri: ${{ env.IMAGE }}
-          rodeHost: ${{ env.RODE_HOST }}
-          rodeInsecure: true
+      - name: test
+        run: |
+          echo ${{ env.GITHUB_EVENT_NAME }}
+          echo ${{ env.GITHUB_EVENT_PATH }}
+          cat ${{ env.GITHUB_EVENT_PATH }}
+#      - name: Checkout Code
+#        uses: actions/checkout@v2
+#
+#      - name: Fetch Access Token
+#        uses: liatrio/github-actions/oauth2-token@master
+#        id: token
+#        with:
+#          clientId: ${{ env.OAUTH2_CLIENT_ID }}
+#          clientSecret: ${{ secrets.CLIENT_SECRET }}
+#          tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
+#
+#      - name: Evaluate Resource
+#        uses: rode/evaluate-policy-action@pr-comment
+#        with:
+#          accessToken: ${{ steps.token.outputs.accessToken }}
+#          githubToken: ${{ secrets.GITHUB_TOKEN }}
+#          enforce: true
+#          policyGroup: rode-demo
+#          resourceUri: ${{ env.IMAGE }}
+#          rodeHost: ${{ env.RODE_HOST }}
+#          rodeInsecure: true
