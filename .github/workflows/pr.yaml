@@ -35,7 +35,6 @@ jobs:
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          githubPrNumber: ${{ github.event.pull_request.number }}
           enforce: true
           policyGroup: rode-demo
           resourceUri: ${{ env.IMAGE }}
