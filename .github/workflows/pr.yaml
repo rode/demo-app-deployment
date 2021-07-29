@@ -55,6 +55,7 @@ jobs:
 
       - name: Attach Evaluation Summary
         uses: liatrio/github-actions/snow-attach-file@snow
+        if: always()
         with:
           filePath: ${{ steps.evaluation.outputs.reportPath }}
           requestSysId: ${{ steps.cr.outputs.sysId }}
