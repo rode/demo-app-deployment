@@ -8,7 +8,7 @@ on:
       - prod
 
 env:
-  IMAGE: harbor.test/rode-demo/rode-demo-node-app@sha256:cc723cb3075eb2d7c855f2351cfaedf67830577f6321f92b0ae5f83701e7552b
+  IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:5911299c6111e742f2035661523b883d1c87c12601b0552604f8b25671b2b600
   RODE_HOST: rode.rode-demo.svc.cluster.local:50051
   OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-enforcer
