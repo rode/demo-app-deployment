@@ -8,8 +8,8 @@ on:
       - prod
 
 env:
-  IMAGE: harbor.test/rode-demo/rode-demo-node-app@sha256:80a8511ea645aacf92825767039f8395be213ac7d22e0685c692619ce966f3cd
-  RODE_HOST: 0.tcp.ngrok.io:16920
+  IMAGE: harbor.test/rode-demo/rode-demo-node-app@sha256:cc723cb3075eb2d7c855f2351cfaedf67830577f6321f92b0ae5f83701e7552b
+  RODE_HOST: 4.tcp.ngrok.io:16700
   OAUTH2_TOKEN_URL: 'https://aha-keycloak.ngrok.io/auth/realms/rode-demo/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-enforcer
   SNOW_URL: https://dev93651.service-now.com
@@ -23,14 +23,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-
-      - name: Fetch Access Token
-        uses: liatrio/github-actions/oauth2-token@master
-        id: token
-        with:
-          clientId: ${{ env.OAUTH2_CLIENT_ID }}
-          clientSecret: ${{ secrets.CLIENT_SECRET }}
-          tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Create Change Request
         uses: liatrio/github-actions/snow-change-request@snow
@@ -46,7 +38,6 @@ jobs:
         uses: rode/evaluate-policy-action@output-report
         id: evaluation
         with:
-          accessToken: ${{ steps.token.outputs.accessToken }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           enforce: true
           policyGroup: rode-demo
@@ -56,7 +47,6 @@ jobs:
 
       - name: Attach Evaluation Summary
         uses: liatrio/github-actions/snow-change-request@snow
-        if: always()
         with:
           action: attach-file
           attachmentFilePath: ${{ steps.evaluation.outputs.reportPath }}
