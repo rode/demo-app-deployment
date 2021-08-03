@@ -36,8 +36,9 @@ jobs:
         uses: liatrio/github-actions/snow-change-request@snow
         id: cr
         with:
+          action: create
           changeRequestMessage: "Deploy demo-app"
-          serviceNowInstanceUrl: ${{ env.SNOW_URL }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
 
@@ -54,11 +55,12 @@ jobs:
           rodeInsecure: true
 
       - name: Attach Evaluation Summary
-        uses: liatrio/github-actions/snow-attach-file@snow
+        uses: liatrio/github-actions/snow-change-request@snow
         if: always()
         with:
-          filePath: ${{ steps.evaluation.outputs.reportPath }}
+          action: attach-file
+          attachmentFilePath: ${{ steps.evaluation.outputs.reportPath }}
           requestSysId: ${{ steps.cr.outputs.sysId }}
-          serviceNowInstanceUrl: ${{ env.SNOW_URL }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
