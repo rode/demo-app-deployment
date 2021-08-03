@@ -30,6 +30,7 @@ jobs:
         with:
           action: create
           changeRequestMessage: "Deploy demo-app"
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
