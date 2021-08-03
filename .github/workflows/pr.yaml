@@ -24,6 +24,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      - name: Fetch Access Token
+        uses: liatrio/github-actions/oauth2-token@master
+        id: token
+        with:
+          clientId: ${{ env.OAUTH2_CLIENT_ID }}
+          clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
+          tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
+
       - name: Create Change Request
         uses: liatrio/github-actions/snow-change-request@snow
         id: cr
@@ -39,6 +47,7 @@ jobs:
         uses: rode/evaluate-policy-action@output-report
         id: evaluation
         with:
+          accessToken: ${{ steps.token.outputs.accessToken }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           enforce: true
           policyGroup: rode-demo
