@@ -9,8 +9,8 @@ on:
 
 env:
   IMAGE: harbor.test/rode-demo/rode-demo-node-app@sha256:cc723cb3075eb2d7c855f2351cfaedf67830577f6321f92b0ae5f83701e7552b
-  RODE_HOST: 4.tcp.ngrok.io:16700
-  OAUTH2_TOKEN_URL: 'https://aha-keycloak.ngrok.io/auth/realms/rode-demo/protocol/openid-connect/token'
+  RODE_HOST: rode.rode-demo.svc.cluster.local:50051
+  OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-enforcer
   SNOW_URL: https://dev112050.service-now.com
   SNOW_USERNAME: admin
