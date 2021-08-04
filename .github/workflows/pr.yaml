@@ -20,6 +20,8 @@ jobs:
     runs-on:
       - self-hosted
       - rode-runners-prod
+    outputs:
+      requestSysId: ${{ steps.cr.outputs.sysId }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -71,6 +73,20 @@ jobs:
           action: approve
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           requestSysId: ${{ steps.cr.outputs.sysId }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+  approved-change-request:
+    needs: evaluate
+    runs-on:
+      - self-hosted
+      - rode-runners-prod
+    steps:
+      - name: Require Change Request Approval
+        uses: liatrio/github-actions/snow-change-request@snow
+        with:
+          action: require-approval
+          requestSysId: ${{ needs.evaluate.outputs.requestSysId }}
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
