@@ -64,3 +64,12 @@ jobs:
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+
+      - name: Approve Change Request
+        uses: liatrio/github-actions/snow-change-request@snow
+        with:
+          action: approve
+          requestSysId: ${{ steps.cr.outputs.sysId }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
