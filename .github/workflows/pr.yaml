@@ -90,3 +90,12 @@ jobs:
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+      - name: Close Change Request
+        uses: liatrio/github-actions/snow-change-request@snow
+        with:
+          action: transition
+          requestSysId: ${{ needs.evaluate.outputs.requestSysId }}
+          transition: 'implement|review|closed'
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
