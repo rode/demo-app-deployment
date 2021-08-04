@@ -69,6 +69,7 @@ jobs:
         uses: liatrio/github-actions/snow-change-request@snow
         with:
           action: approve
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           requestSysId: ${{ steps.cr.outputs.sysId }}
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
