@@ -12,7 +12,7 @@ env:
   RODE_HOST: rode.rode-demo.svc.cluster.local:50051
   OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-enforcer
-  SNOW_URL: https://dev112050.service-now.com
+  SNOW_URL: https://dev103183.service-now.com
   SNOW_USERNAME: admin
 
 jobs:
