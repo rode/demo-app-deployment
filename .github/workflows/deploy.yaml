@@ -33,8 +33,7 @@ jobs:
         with:
           action: lookup-change-request
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-        env:
-          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+          sha: ${{ github.event.pull_request.head.sha }}
 
       - name: Require Change Request Approval
         if: ${{ github.ref != 'refs/heads/dev' }}
