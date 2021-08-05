@@ -33,6 +33,8 @@ jobs:
         with:
           action: lookup-change-request
           githubToken: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
 
       - name: Require Change Request Approval
         if: ${{ github.ref != 'refs/heads/dev' }}
@@ -43,8 +45,6 @@ jobs:
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
-        env:
-          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
 
       - name: Get Resource URI
         id: get
