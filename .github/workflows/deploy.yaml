@@ -43,6 +43,8 @@ jobs:
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+        env:
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
 
       - name: Get Resource URI
         id: get
