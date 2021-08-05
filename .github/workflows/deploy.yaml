@@ -12,6 +12,8 @@ env:
   RODE_HOST: rode.rode-demo.svc.cluster.local:50051
   OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-enforcer
+  SNOW_URL: https://dev103183.service-now.com
+  SNOW_USERNAME: admin
 
 jobs:
   deploy:
@@ -22,12 +24,34 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      - name: Find Change Request
+        if: ${{ github.ref != 'refs/heads/dev' }}
+        id: cr
+        uses: liatrio/github-actions/snow-change-request@snow
+        with:
+          action: lookup-change-request
+
+      - name: Require Change Request Approval
+        if: ${{ github.ref != 'refs/heads/dev' }}
+        uses: liatrio/github-actions/snow-change-request@snow
+        with:
+          action: require-approval
+          requestSysId: ${{ steps.cr.outputs.sysId }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+
       - name: Get Resource URI
         id: get
         run: |
           digest=$(awk '/tag/{print $2}' env-values.yaml)
           resourceUri="${{ env.IMAGE }}@sha256:$digest"
           echo "::set-output name=resourceUri::$resourceUri"
+
+      - name: Get Branch Name
+        id: branch
+        run: |
+          echo "::set-output name=name::${GITHUB_REF#refs/*/}
 
       - name: Fetch Access Token
         uses: liatrio/github-actions/oauth2-token@master
@@ -39,6 +63,7 @@ jobs:
 
       - name: Evaluate Resource
         uses: rode/enforcer-action@v0.3.0
+        id: evaluation
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
           enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
@@ -47,16 +72,50 @@ jobs:
           rodeHost: ${{ env.RODE_HOST }}
           rodeInsecure: true
 
+      - name: Attach Evaluation Summary
+        uses: liatrio/github-actions/snow-change-request@snow
+        if: ${{ github.ref != 'refs/heads/dev' }}
+        with:
+          action: attach-file
+          attachmentFilePath: ${{ steps.evaluation.outputs.reportPath }}
+          attachmentFileName: ${{ steps.branch.outputs.name }}-report.md
+          requestSysId: ${{ steps.cr.outputs.sysId }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+
+      - name: Move Change Request to Implement
+        uses: liatrio/github-actions/snow-change-request@snow
+        if: ${{ github.ref != 'refs/heads/dev' }}
+        with:
+          action: transition
+          requestSysId: ${{ steps.cr.outputs.sysId }}
+          transition: 'implement'
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+
       - name: Install Helm
         run: curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
       - name: Helm Upgrade
         run: |
-          branchName=${GITHUB_REF##*/}
-
           helm version
           helm upgrade -f env-values.yaml \
-            -f environments/${branchName}/values.yaml \
+            -f environments/${DEPLOY_ENV}/values.yaml \
             --install demo-app-test \
             charts/demo-app \
-            -n rode-demo-app-${branchName}
+            -n rode-demo-app-${DEPLOY_ENV}
+        env:
+          DEPLOY_ENV: ${{ steps.branch.outputs.name }}
+
+      - name: Close Change Request
+        if: ${{ github.ref != 'refs/heads/dev' }}
+        uses: liatrio/github-actions/snow-change-request@snow
+        with:
+          action: transition
+          requestSysId: ${{ steps.cr.outputs.sysId }}
+          transition: 'review|closed'
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
