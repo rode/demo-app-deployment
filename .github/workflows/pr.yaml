@@ -8,7 +8,7 @@ on:
       - prod
 
 env:
-  IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app@sha256:5911299c6111e742f2035661523b883d1c87c12601b0552604f8b25671b2b600
+  IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
   RODE_HOST: rode.rode-demo.svc.cluster.local:50051
   OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-enforcer
@@ -25,6 +25,13 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+
+      - name: Get Resource URI
+        id: get
+        run: |
+          digest=$(awk '/tag/{print $2}' env-values.yaml)
+          resourceUri="${{ env.IMAGE }}@sha256:$digest"
+          echo "::set-output name=resourceUri::$resourceUri"
 
       - name: Fetch Access Token
         uses: liatrio/github-actions/oauth2-token@master
@@ -50,8 +57,8 @@ jobs:
         id: evaluation
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
+          enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          enforce: true
           policyGroup: rode-demo
           resourceUri: ${{ env.IMAGE }}
           rodeHost: ${{ env.RODE_HOST }}
@@ -62,6 +69,7 @@ jobs:
         with:
           action: attach-file
           attachmentFilePath: ${{ steps.evaluation.outputs.reportPath }}
+          attachmentFileName: pr-report.md
           requestSysId: ${{ steps.cr.outputs.sysId }}
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
@@ -87,15 +95,6 @@ jobs:
         with:
           action: require-approval
           requestSysId: ${{ needs.evaluate.outputs.requestSysId }}
-          serviceNowUrl: ${{ env.SNOW_URL }}
-          serviceNowUsername: ${{ env.SNOW_USERNAME }}
-          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
-      - name: Close Change Request
-        uses: liatrio/github-actions/snow-change-request@snow
-        with:
-          action: transition
-          requestSysId: ${{ needs.evaluate.outputs.requestSysId }}
-          transition: 'implement|review|closed'
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
