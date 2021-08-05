@@ -30,6 +30,7 @@ jobs:
         uses: liatrio/github-actions/snow-change-request@snow
         with:
           action: lookup-change-request
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Require Change Request Approval
         if: ${{ github.ref != 'refs/heads/dev' }}
@@ -62,7 +63,7 @@ jobs:
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Evaluate Resource
-        uses: rode/enforcer-action@v0.3.0
+        uses: rode/enforcer-action@output-report
         id: evaluation
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
