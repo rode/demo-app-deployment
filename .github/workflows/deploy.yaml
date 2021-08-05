@@ -72,6 +72,7 @@ jobs:
           accessToken: ${{ steps.token.outputs.accessToken }}
           enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
           policyGroup: rode-demo
+          githubToken: ${{ secrets.GITHUB_TOKEN }} # TODO: remove
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
           rodeInsecure: true
