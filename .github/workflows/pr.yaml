@@ -60,7 +60,7 @@ jobs:
           enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           policyGroup: rode-demo
-          resourceUri: ${{ env.IMAGE }}
+          resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
           rodeInsecure: true
 
