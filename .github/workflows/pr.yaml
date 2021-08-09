@@ -1,7 +1,11 @@
 name: pr
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - dev
+      - staging
+      - prod
 
 env:
   IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
@@ -38,7 +42,7 @@ jobs:
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Create Change Request
-        uses: liatrio/github-actions/snow-change-request@snow
+        uses: liatrio/snow-change-request-action@v0.1.0
         id: cr
         with:
           action: create
@@ -61,18 +65,19 @@ jobs:
           rodeInsecure: true
 
       - name: Attach Evaluation Summary
-        uses: liatrio/github-actions/snow-change-request@snow
+        uses: liatrio/snow-change-request-action@v0.1.0
         with:
           action: attach-file
           attachmentFilePath: ${{ steps.evaluation.outputs.reportPath }}
           attachmentFileName: pr-report.md
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           requestSysId: ${{ steps.cr.outputs.sysId }}
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
 
       - name: Approve Change Request
-        uses: liatrio/github-actions/snow-change-request@snow
+        uses: liatrio/snow-change-request-action@v0.1.0
         with:
           action: approve
           githubToken: ${{ secrets.GITHUB_TOKEN }}
@@ -87,9 +92,10 @@ jobs:
       - rode-runners-prod
     steps:
       - name: Require Change Request Approval
-        uses: liatrio/github-actions/snow-change-request@snow
+        uses: liatrio/snow-change-request-action@v0.1.0
         with:
           action: require-approval
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           requestSysId: ${{ needs.evaluate.outputs.requestSysId }}
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}

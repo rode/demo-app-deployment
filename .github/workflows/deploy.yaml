@@ -1,7 +1,7 @@
 name: deploy
 
 on:
-  pull_request:
+  push:
     branches:
       - dev
       - staging
@@ -29,7 +29,7 @@ jobs:
       - name: Find Change Request
         if: ${{ github.ref != 'refs/heads/dev' }}
         id: cr
-        uses: liatrio/github-actions/snow-change-request@snow
+        uses: liatrio/snow-change-request-action@v0.1.0
         with:
           action: lookup-change-request
           githubToken: ${{ secrets.GITHUB_TOKEN }}
@@ -37,9 +37,10 @@ jobs:
 
       - name: Require Change Request Approval
         if: ${{ github.ref != 'refs/heads/dev' }}
-        uses: liatrio/github-actions/snow-change-request@snow
+        uses: liatrio/snow-change-request-action@v0.1.0
         with:
           action: require-approval
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           requestSysId: ${{ steps.cr.outputs.sysId }}
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
@@ -55,8 +56,7 @@ jobs:
       - name: Get Branch Name
         id: branch
         run: |
-          #echo "::set-output name=name::${GITHUB_REF##*/}"
-          echo "::set-output name=name::dev"
+          echo "::set-output name=name::${GITHUB_REF##*/}"
 
       - name: Fetch Access Token
         uses: liatrio/github-actions/oauth2-token@master
@@ -73,28 +73,29 @@ jobs:
           accessToken: ${{ steps.token.outputs.accessToken }}
           enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
           policyGroup: rode-demo
-          githubToken: ${{ secrets.GITHUB_TOKEN }} # TODO: remove
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
           rodeInsecure: true
 
       - name: Attach Evaluation Summary
-        uses: liatrio/github-actions/snow-change-request@snow
+        uses: liatrio/snow-change-request-action@v0.1.0
         if: ${{ github.ref != 'refs/heads/dev' }}
         with:
           action: attach-file
           attachmentFilePath: ${{ steps.evaluation.outputs.reportPath }}
           attachmentFileName: ${{ steps.branch.outputs.name }}-report.md
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           requestSysId: ${{ steps.cr.outputs.sysId }}
           serviceNowUrl: ${{ env.SNOW_URL }}
           serviceNowUsername: ${{ env.SNOW_USERNAME }}
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
 
       - name: Move Change Request to Implement
-        uses: liatrio/github-actions/snow-change-request@snow
+        uses: liatrio/snow-change-request-action@v0.1.0
         if: ${{ github.ref != 'refs/heads/dev' }}
         with:
           action: transition
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           requestSysId: ${{ steps.cr.outputs.sysId }}
           transition: 'implement'
           serviceNowUrl: ${{ env.SNOW_URL }}
@@ -117,9 +118,10 @@ jobs:
 
       - name: Close Change Request
         if: ${{ github.ref != 'refs/heads/dev' }}
-        uses: liatrio/github-actions/snow-change-request@snow
+        uses: liatrio/snow-change-request-action@v0.1.0
         with:
           action: transition
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
           requestSysId: ${{ steps.cr.outputs.sysId }}
           transition: 'review|closed'
           serviceNowUrl: ${{ env.SNOW_URL }}
