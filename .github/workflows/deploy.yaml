@@ -67,7 +67,7 @@ jobs:
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Evaluate Resource
-        uses: rode/enforcer-action@output-report
+        uses: rode/evaluate-policy-action@v0.3.1
         id: evaluation
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}

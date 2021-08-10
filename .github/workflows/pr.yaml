@@ -53,7 +53,7 @@ jobs:
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
 
       - name: Evaluate Resource
-        uses: rode/evaluate-policy-action@output-report
+        uses: rode/evaluate-policy-action@v0.3.1
         id: evaluation
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
