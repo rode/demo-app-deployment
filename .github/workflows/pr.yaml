@@ -42,7 +42,7 @@ jobs:
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Create Change Request
-        uses: liatrio/snow-change-request-action@v0.1.0
+        uses: liatrio/snow-change-request-action@v0.1.1
         id: cr
         with:
           action: create
@@ -65,7 +65,7 @@ jobs:
           rodeInsecure: true
 
       - name: Attach Evaluation Summary
-        uses: liatrio/snow-change-request-action@v0.1.0
+        uses: liatrio/snow-change-request-action@v0.1.1
         with:
           action: attach-file
           attachmentFilePath: ${{ steps.evaluation.outputs.reportPath }}
@@ -77,7 +77,7 @@ jobs:
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
 
       - name: Approve Change Request
-        uses: liatrio/snow-change-request-action@v0.1.0
+        uses: liatrio/snow-change-request-action@v0.1.1
         with:
           action: approve
           githubToken: ${{ secrets.GITHUB_TOKEN }}
@@ -92,7 +92,7 @@ jobs:
       - rode-runners-prod
     steps:
       - name: Require Change Request Approval
-        uses: liatrio/snow-change-request-action@v0.1.0
+        uses: liatrio/snow-change-request-action@v0.1.1
         with:
           action: require-approval
           githubToken: ${{ secrets.GITHUB_TOKEN }}

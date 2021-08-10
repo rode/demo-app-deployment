@@ -29,7 +29,7 @@ jobs:
       - name: Find Change Request
         if: ${{ github.ref != 'refs/heads/dev' }}
         id: cr
-        uses: liatrio/snow-change-request-action@v0.1.0
+        uses: liatrio/snow-change-request-action@v0.1.1
         with:
           action: lookup-change-request
           githubToken: ${{ secrets.GITHUB_TOKEN }}
@@ -37,7 +37,7 @@ jobs:
 
       - name: Require Change Request Approval
         if: ${{ github.ref != 'refs/heads/dev' }}
-        uses: liatrio/snow-change-request-action@v0.1.0
+        uses: liatrio/snow-change-request-action@v0.1.1
         with:
           action: require-approval
           githubToken: ${{ secrets.GITHUB_TOKEN }}
@@ -78,7 +78,7 @@ jobs:
           rodeInsecure: true
 
       - name: Attach Evaluation Summary
-        uses: liatrio/snow-change-request-action@v0.1.0
+        uses: liatrio/snow-change-request-action@v0.1.1
         if: ${{ github.ref != 'refs/heads/dev' }}
         with:
           action: attach-file
@@ -91,7 +91,7 @@ jobs:
           serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
 
       - name: Move Change Request to Implement
-        uses: liatrio/snow-change-request-action@v0.1.0
+        uses: liatrio/snow-change-request-action@v0.1.1
         if: ${{ github.ref != 'refs/heads/dev' }}
         with:
           action: transition
@@ -118,7 +118,7 @@ jobs:
 
       - name: Close Change Request
         if: ${{ github.ref != 'refs/heads/dev' }}
-        uses: liatrio/snow-change-request-action@v0.1.0
+        uses: liatrio/snow-change-request-action@v0.1.1
         with:
           action: transition
           githubToken: ${{ secrets.GITHUB_TOKEN }}
