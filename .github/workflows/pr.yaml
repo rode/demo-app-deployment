@@ -12,12 +12,16 @@ env:
   RODE_HOST: rode.rode-demo.svc.cluster.local:50051
   OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-enforcer
+  SNOW_URL: https://dev66754.service-now.com
+  SNOW_USERNAME: admin
 
 jobs:
   evaluate:
     runs-on:
       - self-hosted
       - rode-runners-prod
+    outputs:
+      requestSysId: ${{ steps.cr.outputs.sysId }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -37,8 +41,20 @@ jobs:
           clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
+      - name: Create Change Request
+        uses: liatrio/snow-change-request-action@v0.1.1
+        id: cr
+        with:
+          action: create
+          changeRequestMessage: "Deploy demo-app"
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+
       - name: Evaluate Resource
-        uses: rode/enforcer-action@v0.3.0
+        uses: rode/evaluate-policy-action@v0.3.1
+        id: evaluation
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
           enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
@@ -47,3 +63,40 @@ jobs:
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
           rodeInsecure: true
+
+      - name: Attach Evaluation Summary
+        uses: liatrio/snow-change-request-action@v0.1.1
+        with:
+          action: attach-file
+          attachmentFilePath: ${{ steps.evaluation.outputs.reportPath }}
+          attachmentFileName: pr-report.md
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          requestSysId: ${{ steps.cr.outputs.sysId }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+
+      - name: Approve Change Request
+        uses: liatrio/snow-change-request-action@v0.1.1
+        with:
+          action: approve
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          requestSysId: ${{ steps.cr.outputs.sysId }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
+  approved-change-request:
+    needs: evaluate
+    runs-on:
+      - self-hosted
+      - rode-runners-prod
+    steps:
+      - name: Require Change Request Approval
+        uses: liatrio/snow-change-request-action@v0.1.1
+        with:
+          action: require-approval
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          requestSysId: ${{ needs.evaluate.outputs.requestSysId }}
+          serviceNowUrl: ${{ env.SNOW_URL }}
+          serviceNowUsername: ${{ env.SNOW_USERNAME }}
+          serviceNowPassword: ${{ secrets.SNOW_PASSWORD }}
