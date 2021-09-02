@@ -6,6 +6,7 @@ on:
       - dev
       - staging
       - prod
+      - sharedsvc
 
 env:
   IMAGE: harbor.services.liatr.io/liatrio/rode-demo-node-app
