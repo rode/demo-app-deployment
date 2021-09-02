@@ -40,14 +40,13 @@ jobs:
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Evaluate Resource
-        uses: rode/enforcer-action@v0.3.0
+        uses: rode/enforcer-action@v0.3.2
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
           enforce: ${{ github.ref != 'refs/heads/dev' }} # don't require policy to pass in dev
           policyGroup: rode-demo
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
-          rodeInsecure: true
 
       - name: Install Helm
         run: curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
