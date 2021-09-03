@@ -6,7 +6,6 @@ on:
       - dev
       - staging
       - prod
-      - sharedsvc
 
 env:
   IMAGE: harbor.services.liatr.io/liatrio/rode-demo-node-app
@@ -53,7 +52,7 @@ jobs:
 
       - name: Helm Upgrade
         run: |
-          branchName=dev
+          branchName=${GITHUB_REF##*/}
 
           helm version
           helm upgrade -f env-values.yaml \
