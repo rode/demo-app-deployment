@@ -53,7 +53,7 @@ jobs:
 
       - name: Helm Upgrade
         run: |
-          branchName=${GITHUB_REF##*/}
+          branchName=dev
 
           helm version
           helm upgrade -f env-values.yaml \
