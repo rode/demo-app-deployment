@@ -5,13 +5,12 @@
 replicaCount: 1
 
 image:
-  repository: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
+  repository: harbor.services.liatr.io/liatrio/rode-demo-node-app
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-imagePullSecrets:
-  - name: harbor
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 

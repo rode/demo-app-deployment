@@ -8,9 +8,9 @@ on:
       - prod
 
 env:
-  IMAGE: harbor.internal.lead.prod.liatr.io/rode-demo/rode-demo-node-app
-  RODE_HOST: rode.rode-demo.svc.cluster.local:50051
-  OAUTH2_TOKEN_URL: 'https://keycloak.internal.lead.prod.liatr.io/auth/realms/rode-demo/protocol/openid-connect/token'
+  IMAGE: harbor.services.liatr.io/liatrio/rode-demo-node-app
+  RODE_HOST: rode-grpc.services.liatr.io:443
+  OAUTH2_TOKEN_URL: 'https://keycloak.services.liatr.io/auth/realms/liatrio/protocol/openid-connect/token'
   OAUTH2_CLIENT_ID: rode-enforcer
 
 jobs:
@@ -18,6 +18,7 @@ jobs:
     runs-on:
       - self-hosted
       - rode-runners-prod
+    environment: liatrio-sharedsvc
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -38,7 +39,7 @@ jobs:
           tokenUrl: ${{ env.OAUTH2_TOKEN_URL }}
 
       - name: Evaluate Resource
-        uses: rode/enforcer-action@v0.3.0
+        uses: rode/enforcer-action@v0.3.2
         with:
           accessToken: ${{ steps.token.outputs.accessToken }}
           enforce: ${{ github.base_ref != 'dev' }} # don't require policy to pass when a PR targets dev
@@ -46,4 +47,3 @@ jobs:
           policyGroup: rode-demo
           resourceUri: ${{ steps.get.outputs.resourceUri }}
           rodeHost: ${{ env.RODE_HOST }}
-          rodeInsecure: true
